@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>好朋友交流会</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", "SimSun", "宋体", Arial, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(255,255,255,0.8) 0 8%, transparent 9%),
+                radial-gradient(circle at 90% 18%, rgba(255,255,255,0.6) 0 6%, transparent 7%),
+                radial-gradient(circle at 15% 85%, rgba(255,255,255,0.7) 0 7%, transparent 8%),
+                linear-gradient(135deg, #fce4ec 0%, #e8f5ff 45%, #fffaf0 100%);
+            position: relative;
+            overflow-x: hidden;
+            color: #111;
+        }
+
+        /* 复古动态装饰：像素星星 */
+        .pixel-star {
+            position: fixed;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            box-shadow:
+                0 0 0 2px #ff99cc,
+                2px 2px 0 2px #ff66b2,
+                -2px 2px 0 2px #ff66b2,
+                2px -2px 0 2px #ff66b2,
+                -2px -2px 0 2px #ff66b2;
+            animation: pixelBlink 1.8s steps(2) infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes pixelBlink {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.6);
+            }
+        }
+
+        /* 动态闪光小圆点 */
+        .sparkle-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffd700;
+            animation: sparkle 1.2s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0.2;
+                box-shadow: 0 0 4px #ffd700;
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 10px #ffd700, 0 0 20px #ffec8b;
+            }
+        }
+
+        /* 顶部复古标题栏 */
+        .top-bar {
+            position: relative;
+            z-index: 3;
+            background: linear-gradient(90deg, #ff99cc, #66ccff, #ffcc66);
+            background-size: 200% 100%;
+            animation: barShine 6s linear infinite;
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #333;
+        }
+
+        @keyframes barShine {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        /* 聊天室容器 */
+        .chat-room {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+            margin: 30px auto;
+            background: rgba(255,255,255,0.96);
+            border: 2px solid #ff99cc;
+            border-radius: 8px;
+            box-shadow:
+                0 0 0 4px #fff,
+                0 8px 25px rgba(255,153,204,0.25);
+            overflow: hidden;
+        }
+
+        /* 头部 */
+        .chat-header {
+            background: #fff0f5;
+            border-bottom: 1px dashed #ff99cc;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.4em;
+            color: #ff66b2;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .chat-header .year-tag {
+            display: inline-block;
+            background: #ff66b2;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+
+        .chat-header .desc {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        /* 动态小图区域 */
+        .anim-gif-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 10px;
+            background: #fafafa;
+            border-bottom: 1px dashed #ff99cc;
+            flex-wrap: wrap;
+        }
+
+        .gif-box {
+            width: 48px;
+            height: 48px;
+            border: 1px solid #ff99cc;
+            border-radius: 6px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* 内容区 */
+        .chat-content {
+            padding: 20px;
+            max-height: 78vh;
+            overflow-y: auto;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 28px,
+                    rgba(255,153,204,0.08) 28px,
+                    rgba(255,153,204,0.08) 29px
+                );
+        }
+
+        .chat-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-content::-webkit-scrollbar-thumb {
+            background: #ff99cc;
+            border-radius: 4px;
+        }
+
+        /* 消息 */
+        .message-item {
+            margin-bottom: 18px;
+            max-width: 85%;
+        }
+
+        .nickname {
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            padding-left: 6px;
+            font-weight: bold;
+        }
+
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 4px;
+            background: #fffaf0;
+            border: 1px solid #ffd1dc;
+            line-height: 1.65;
+            font-size: 0.96em;
+            word-break: break-word;
+            position: relative;
+        }
+
+        .bubble::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: -6px;
+            width: 12px;
+            height: 12px;
+            background: #fffaf0;
+            border-left: 1px solid #ffd1dc;
+            border-top: 1px solid #ffd1dc;
+            transform: rotate(45deg);
+        }
+
+        /* 昵称颜色 */
+        .nick-砚砚 { color: #ff7aa8; }
+        .nick-阿灶 { color: #ff9966; }
+        .nick-砂砂 { color: #b380ff; }
+        .nick-阿潮 { color: #66b3ff; }
+        .nick-线线 { color: #5cd6a8; }
+        .nick-灰灰 { color: #999999; }
+        .nick-锁锁 { color: #e6b84d; }
+        .nick-岁岁 { color: #ff80bf; }
+
+        /* 点击爱心 */
+        .heart {
+            position: fixed;
+            color: #ff69b4;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 999;
+            animation: floatUp 1.5s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+
+        /* 移动端 */
+        @media (max-width: 640px) {
+            .chat-room {
+                margin: 18px 10px;
+            }
+
+            .chat-header h1 {
+                font-size: 1.2em;
+            }
+
+            .chat-content {
+                padding: 15px;
+            }
+
+            .message-item {
+                max-width: 92%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部复古闪光条 -->
+    <div class="top-bar">✨ 欢迎来到好朋友交流会 ✨</div>
+
+    <!-- 动态星星与装饰 -->
+    <div class="pixel-star" style="left: 10%; top: 15%; animation-delay: 0s;"></div>
+    <div class="pixel-star" style="left: 85%; top: 20%; animation-delay: 0.4s;"></div>
+    <div class="pixel-star" style="left: 18%; top: 80%; animation-delay: 0.8s;"></div>
+    <div class="pixel-star" style="left: 75%; top: 72%; animation-delay: 1.2s;"></div>
+
+    <div class="sparkle-dot" style="left: 25%; top: 10%; animation-delay: 0s;"></div>
+    <div class="sparkle-dot" style="left: 60%; top: 8%; animation-delay: 0.5s;"></div>
+    <div class="sparkle-dot" style="left: 40%; top: 88%; animation-delay: 1s;"></div>
+
+    <div class="chat-room">
+        <div class="chat-header">
+            <h1>好朋友交流会</h1>
+            <div class="desc">
+                <span class="year-tag">2007</span>
+                这里是我们的小窝，星星会闪，聊天会一直都在。
+            </div>
+        </div>
+
+        <!-- 动态小图区 -->
+        <div class="anim-gif-row">
+            <div class="gif-box">🌟</div>
+            <div class="gif-box">💗</div>
+            <div class="gif-box">🐾</div>
+            <div class="gif-box">🍬</div>
+            <div class="gif-box">📞</div>
+        </div>
+
+        <div class="chat-content" id="chatContent">
+            <div class="message-item">
+                <div class="nickname nick-砚砚">[砚砚]</div>
+                <div class="bubble">我刚刚给我们的聊天室换了新皮肤诶！粉白的玉桂狗背景，还加了星星闪的动效！好看不？</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿灶">[阿灶]</div>
+                <div class="bubble">我去！也太好看了吧！砚砚你手也太巧了</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砂砂">[砂砂]</div>
+                <div class="bubble">诶？这个星星点了还会冒爱心…我戳了三分钟了哈哈哈哈</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿潮">[阿潮]</div>
+                <div class="bubble">今天放学我踩了满鞋的泥，赶紧上线看看咱们的新窝，瞬间不脏了</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-线线">[线线]</div>
+                <div class="bubble">真的好好看，我们这个聊天室应该是独一无二的吧</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-灰灰">[灰灰]</div>
+                <div class="bubble">真好啊，我一放学就来看咱们的聊天室了</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-锁锁">[锁锁]</div>
+                <div class="bubble">我把我玉桂狗钥匙扣拍了照传相册里了！以后咱们的聊天记录都能存这里</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-岁岁">[岁岁]</div>
+                <div class="bubble">我宣布！这是全世界最好看的聊天室！没有之一！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砚砚">[砚砚]</div>
+                <div class="bubble">嘿嘿，以后每周我都给咱们更新皮肤，下周整个库洛米的！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿灶">[阿灶]</div>
+                <div class="bubble">说定了！周末咱们约去我家，我用新奶锅给大家煮草莓牛奶！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砂砂">[砂砂]</div>
+                <div class="bubble">我带我的超大号捏捏乐！如果，真的？能见面的话咱们八个一起捏，捏成个超大团子！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿潮">[阿潮]</div>
+                <div class="bubble">我带赶海捡的小贝壳，给每个人串个小吊坠，挂手绳上刚好！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-线线">[线线]</div>
+                <div class="bubble">我把咱们的手绳都带来，现场给大家系上，刚好配贝壳吊坠！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-灰灰">[灰灰]</div>
+                <div class="bubble">我带粉笔！咱们在阿灶家楼下的空地上画超大的玉桂狗，跟咱们的聊天室背景一样！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-锁锁">[锁锁]</div>
+                <div class="bubble">我带我藏的漫画书！咱们煮完牛奶就瘫在沙发上看，没人管咱们…</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-岁岁">[岁岁]</div>
+                <div class="bubble">我带我存的奶糖！橘子味的，一人一颗，甜到跺脚的那种</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砚砚">[砚砚]</div>
+                <div class="bubble">天呐，我现在就盼着周末了，感觉上学都有劲儿了</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿灶">[阿灶]</div>
+                <div class="bubble">我也是，以前放学回家都没人说话，现在一放学到点就想往家跑</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砂砂">[砂砂]</div>
+                <div class="bubble">谁不是啊！我妈说我最近放学都不蹲楼下玩泥了，一门心思往家冲</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-阿潮">[阿潮]</div>
+                <div class="bubble">我也是，以前放学就想和妹妹往海边跑，现在就想赶紧上线跟你们唠两句</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-线线">[线线]</div>
+                <div class="bubble">咱们以后要一直一直在这里，当一辈子的好朋友好不好？</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-灰灰">[灰灰]</div>
+                <div class="bubble">好！拉钩！谁先走谁是小狗！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-锁锁">[锁锁]</div>
+                <div class="bubble">拉钩上吊，一百年不许变！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-岁岁">[岁岁]</div>
+                <div class="bubble">变了的人就吃不到橘子味奶糖！</div>
+            </div>
+
+            <div class="message-item">
+                <div class="nickname nick-砚砚">[砚砚]</div>
+                <div class="bubble">那我就把他从咱们聊天室踢出去，再也不让他进！</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 点击冒爱心
+        document.addEventListener('click', function(e) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '💗';
+            heart.style.left = e.clientX - 10 + 'px';
+            heart.style.top = e.clientY - 10 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1500);
+        });
+
+        // 自动滚到底部
+        window.onload = function() {
+            const chatContent = document.getElementById('chatContent');
+            chatContent.scrollTop = chatContent.scrollHeight;
+        };
+    </script>
+</body>
+</html>
