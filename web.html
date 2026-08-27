@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>致我的女孩 💗</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffc3d0, #ff94ab, #ffb8c8);
+            font-family: "Microsoft Yahei", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .card {
+            background: rgba(255,255,255,0.85);
+            max-width: 520px;
+            width: 100%;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(220,80,120,0.25);
+            text-align: center;
+        }
+        h1 {
+            color: #d84b73;
+            margin-bottom: 24px;
+            font-size: 28px;
+        }
+        p {
+            color: #555;
+            line-height: 2;
+            font-size: 16px;
+            margin-bottom:14px;
+        }
+        .tip {
+            margin-top:30px;
+            font-size:14px;
+            color:#b0607c;
+        }
+        /* 飘落爱心 */
+        .heart{
+            position:fixed;
+            font-size:24px;
+            pointer-events:none;
+            z-index:999;
+            animation: fall 7s linear forwards;
+        }
+        @keyframes fall {
+            0%{transform: translateY(-10vh) rotate(0deg);opacity:1;}
+            100%{transform: translateY(110vh) rotate(360deg);opacity:0;}
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>💌致我的宝贝</h1>
+        <p>很庆幸人海之中，能够遇见你</p>
+        <p>和你在一起的每一刻，都闪闪发光</p>
+        <p>开心想和你分享，难过也想靠着你</p>
+        <p>往后岁岁年年，我都想陪在你的身边</p>
+        <p>愿我们，朝朝暮暮，永不分离❤️</p>
+        <div class="tip">✨点击页面任意位置，会落下爱心</div>
+    </div>
+
+<script>
+//点击生成爱心
+document.body.addEventListener('click',(e)=>{
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerText = ['❤️','💗','💖','💕','💓'][Math.floor(Math.random()*5)];
+    heart.style.left = e.clientX + 'px';
+    heart.style.top = e.clientY + 'px';
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),7000);
+})
+</script>
+</body>
+</html>
