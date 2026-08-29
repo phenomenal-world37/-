@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愿命运庇佑 · 藤下雾</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "楷体", "STKaiti", "宋体", serif;
+            background: #1a1a24;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(212, 184, 118, 0.08) 0%, transparent 60%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 24px;
+            min-height: 100vh;
+            color: #d4c7a8;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 32px;
+            color: #e6d8b0;
+            letter-spacing: 8px;
+            margin-bottom: 12px;
+            text-shadow: 0 0 20px rgba(230, 216, 176, 0.2);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #a89b7e;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .desc {
+            font-size: 15px;
+            color: #b5a88c;
+            line-height: 1.8;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .divider {
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #8b7d60, transparent);
+            margin: 30px auto;
+        }
+
+        .input-area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #5c5240;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: #a89b7e;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #6b5f4a;
+            border-radius: 6px;
+            color: #e6d8b0;
+            font-family: inherit;
+            font-size: 16px;
+            letter-spacing: 1px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .name-input:focus {
+            border-color: #d4b876;
+        }
+
+        .pray-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b7355, #6b5a42);
+            border: none;
+            border-radius: 6px;
+            color: #fff9e8;
+            font-family: inherit;
+            font-size: 17px;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2);
+        }
+
+        .pray-btn:hover {
+            background: linear-gradient(135deg, #a08562, #7d6a4f);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 115, 85, 0.3);
+        }
+
+        .pray-btn:active {
+            transform: translateY(0);
+        }
+
+        .wall-section {
+            margin-top: 20px;
+        }
+
+        .wall-title {
+            font-size: 18px;
+            color: #c9b98f;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .count {
+            font-size: 14px;
+            color: #8b7d60;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .name-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .name-tag {
+            padding: 8px 16px;
+            background: rgba(230, 216, 176, 0.08);
+            border: 1px solid #5c5240;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #d4c7a8;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .empty-tip {
+            color: #6b5f4a;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 13px;
+            color: #6b5f4a;
+            letter-spacing: 1px;
+        }
+
+        .thread-icon {
+            font-size: 20px;
+            margin: 0 6px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+            .input-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">愿命运庇佑</div>
+            <div class="subtitle">【欺诈】歌者 · 藤下雾</div>
+            <div class="desc">
+                他正在ICU中与死神博弈。
+                <br>
+                留下你的网名，为他系上一根祈愿的丝线。
+                <br>
+                愿命运垂青，愿平安归来。
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="input-area">
+            <div class="input-label">请留下你的网名</div>
+            <input type="text" class="name-input" id="nameInput" placeholder="写下你的名字，为他祈愿" maxlength="20">
+            <button class="pray-btn" id="prayBtn">愿命运庇佑你</button>
+        </div>
+
+        <div class="wall-section">
+            <div class="wall-title">
+                <span class="thread-icon">🧵</span>
+                祈愿墙
+                <span class="thread-icon">🧵</span>
+            </div>
+            <div class="count" id="countText">已有 0 人为他祈福</div>
+            <div class="name-list" id="nameList">
+                <div class="empty-tip">还没有人留下祈愿，成为第一个吧</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            旧时代的命运未曾终结，新时代的命运尚未开始
+            <br>
+            愿命运庇佑每一个人
+        </div>
+    </div>
+
+    <script>
+        const nameInput = document.getElementById('nameInput');
+        const prayBtn = document.getElementById('prayBtn');
+        const nameList = document.getElementById('nameList');
+        const countText = document.getElementById('countText');
+        const STORAGE_KEY = 'tengxiawu_pray_list';
+
+        // 读取本地存储的祈愿列表
+        function getPrayList() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // 保存祈愿列表
+        function savePrayList(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            } catch (e) {
+                console.error('保存失败', e);
+            }
+        }
+
+        // 渲染列表
+        function renderList() {
+            const list = getPrayList();
+            countText.textContent = `已有 ${list.length} 人为他祈福`;
+
+            if (list.length === 0) {
+                nameList.innerHTML = '<div class="empty-tip">还没有人留下祈愿，成为第一个吧</div>';
+                return;
+            }
+
+            nameList.innerHTML = '';
+            list.forEach(name => {
+                const tag = document.createElement('div');
+                tag.className = 'name-tag';
+                tag.textContent = name;
+                nameList.appendChild(tag);
+            });
+        }
+
+        // 提交祈愿
+        function submitPray() {
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameInput.focus();
+                nameInput.style.borderColor = '#c27a7a';
+                setTimeout(() => {
+                    nameInput.style.borderColor = '';
+                }, 1000);
+                return;
+            }
+
+            const list = getPrayList();
+            list.push(name);
+            savePrayList(list);
+            renderList();
+
+            nameInput.value = '';
+            
+            // 提交后滚动到列表
+            nameList.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // 按钮点击
+        prayBtn.addEventListener('click', submitPray);
+
+        // 回车提交
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                submitPray();
+            }
+        });
+
+        // 初始化
+        renderList();
+    </script>
+</body>
+</html>
