@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>亡群回忆录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "楷体", "STKaiti", serif;
+            background: #f3e9d2;
+            background-image: 
+                radial-gradient(#d4c4a8 1px, transparent 1px),
+                radial-gradient(#d4c4a8 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #4a3b2a;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            padding-top: 30px;
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: #5c4033;
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(92, 64, 51, 0.2);
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #7a6552;
+            letter-spacing: 2px;
+        }
+
+        .gyro-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: #fff9ef;
+            border: 2px solid #c9b896;
+            border-radius: 6px;
+            color: #5c4033;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 2px 2px 6px rgba(92, 64, 51, 0.2);
+        }
+
+        .gyro-btn:active {
+            transform: scale(0.96);
+        }
+
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            perspective: 1000px;
+        }
+
+        .item {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            background: #fff9ef;
+            border: 2px solid #c9b896;
+            border-radius: 8px;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 4px 4px 10px rgba(92, 64, 51, 0.2);
+            transition: box-shadow 0.2s ease, transform 0.1s ease-out;
+            user-select: none;
+            touch-action: none;
+            will-change: transform;
+        }
+
+        .item:hover {
+            box-shadow: 6px 6px 15px rgba(92, 64, 51, 0.3);
+        }
+
+        .item.grabbed {
+            box-shadow: 8px 12px 20px rgba(92, 64, 51, 0.4);
+            z-index: 999 !important;
+        }
+
+        .item-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #5c4033;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(74, 59, 42, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff9ef;
+            border: 2px solid #c9b896;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px 35px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            color: #7a6552;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #5c4033;
+        }
+
+        .memory-author {
+            font-size: 18px;
+            font-weight: bold;
+            color: #5c4033;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #c9b896;
+            letter-spacing: 1px;
+        }
+
+        .memory-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #4a3b2a;
+            white-space: pre-wrap;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f3e9d2;
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #c9b896;
+            border-radius: 3px;
+        }
+
+        .tip {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: #7a6552;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+            .modal-content {
+                padding: 25px 20px;
+            }
+            .item-icon {
+                font-size: 32px;
+            }
+            .item-name {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="gyro-btn" id="gyroBtn">开启陀螺仪</button>
+
+    <div class="header">
+        <h1>亡群回忆录</h1>
+        <p>轻触物件拾忆，长按可拿起挪动</p>
+    </div>
+
+    <div class="scene" id="scene"></div>
+
+    <div class="tip">倾斜手机可看见物件飘动 · 长按抓取</div>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <div class="memory-author" id="memoryAuthor"></div>
+            <div class="memory-text" id="memoryText"></div>
+        </div>
+    </div>
+
+    <script>
+        // 回忆数据
+        const memories = [
+            {
+                name: '残破的书页',
+                icon: '📖',
+                author: '回忆主人：小猫和ym',
+                content: `沉默是好人，时间不会私自加人奕梦喜欢抽烟，对，不能说喜欢吧，但喜欢问NPC抽不抽
+
+神选很聪明
+
+杨总的智商很高
+
+欺诈人很好，我怎么成“子嗣牧”了
+
+其实  真理和吃鱼的关系很好的
+
+怎么讲呢，对家和我们的关系好像出奇的好
+
+因为试炼我分手了，但我深知这不仅仅是试炼的原因
+
+土豆写的道具都很长
+
+以玫让土豆送过我道具，欺诈的信徒对我都特别好，欺诈主神人也特别好，我很开心
+
+桉雨，基本的神选，小玥，小猫，还有大部分神明人都很好`
+            },
+            {
+                name: '赞美诗集',
+                icon: '📜',
+                author: '回忆主人：土豆',
+                content: `真理的猎人曾在行于道路的途中赞美多位神明，但却在时代的尾声隆重赞美了自己最初的信仰。
+
+回想初衷，发现只是因为可以帮忙解答才加入的信仰。途中的风景五花缭乱，让人沉迷其中。直到在故事的尾声惊醒，隆重的赞美了自己的初衷。
+
+旧时代的落幕，即是新故事的开启！戏剧一幕接一幕落下，可又总会开启。在遥远的将来！在新时代到来之时！我们说不定能够在此重逢。
+
+致与我共度暑假的你们`
+            },
+            {
+                name: '镜子',
+                icon: '🪞',
+                author: '回忆主人：杂',
+                content: `曾共围坐析迷局，灯下推谜意自痴。
+相与剖解书中秘，片言谈笑亦相知。
+孰料一朝云散处，旧阁倾颓各别离。
+
+多少深夜往复的探讨，未曾走完的副本，悬而未决的伏笔，还来不及揭晓的真相，尽数沉淀在记忆之中。那些热烈的思绪，彼此碰撞的灵光，随群聊消散，却未曾真正湮灭。
+
+萍水相逢本就短暂，可这份相同的热爱格外珍贵。纵然如今人海四散，各赴前路，也愿心底这份念想长存。若来日机缘巧合再度相逢，还可重论旧事，再入那重重迷局。
+
+旧时代的落幕不代表我们不再有交集，而是新时代的开始，赞美一切`
+            },
+            {
+                name: '望远镜',
+                icon: '🔭',
+                author: '回忆主人：繁',
+                content: `进这个群之前从来没有想过能在微信加那么多好友，虽然很多是因为试炼加的，但在朋友圈，在视频号，总能看见属于你们的足迹，微信红点不再只有冷冰冰的公众号推送，还有专属于你们的数字。
+
+熟络了之后，一起打本，一起聊天，大半夜挂着语音打电话，我那时候想，最快乐的时光也不过如此了。
+
+可是花期总是短暂的，突然得知这个群要解散的消息，我感觉天都要踏下来了，在其他成员的据理力争之下，群主决定从解散群改成了放养。可是群也已经回不去从前了。
+
+敬当下，敬昨日，敬未来，亡群回忆录，我会永远铭记这段时光`
+            },
+            {
+                name: '一叠剧本',
+                icon: '📜',
+                author: '回忆主人：立秋日',
+                content: `当然你们也可以叫我立秋或者是立秋日。我是个诡术大师，也是个编剧，同时，我也是欺诈令使。
+
+我在8月4日加入了这个大家庭在这里我认识了许多新朋友，虽然发生了一些不愉快的事情，但是没关系，谁叫我心肠好呢～我都原谅啦。
+
+我是最爱搓道具之人，平时没事干的时候就爱给小骗子们搓搓道具，他们开心，我也开心。
+
+8月28日，我收到了群聊解散的消息，我不明白这是为什么，但是源初也有他的苦衷，我不怪他。毕竟在次期间我也收获了无尽的快乐。我那亲爱的混蛋恩主也为我提供了一个温暖的“家”。
+
+emmmm，其实我是真的不知道改写一些什么了。但是我最后还是想说一句：赞美【虚无】！赞美【诸神愚戏】赞美我亲爱的朋友们——立秋日.`
+            },
+            {
+                name: '32张扑克牌',
+                icon: '🃏',
+                author: '回忆主人：现象',
+                content: `曾经以为，离别是离开不爱的人，有一天，长大了，才发现，有一种离别，是离开你爱的人，有一种离别，是擦着眼泪，不敢回首。
+
+现象，你也可以叫我雾论虚实^ ^，魔术师，嘻嘻嘻最爱写本之人！虽然加入这个大家庭有且仅有14天，但是你们真真正正给我带来了快乐，我爱你们！
+
+做主持真的好爽，特别是作为欺诈试炼的撰写者，看着玩家们在我布下的迷局中团团乱转，就，很，爽！
+
+8.28，我在，写，终末之诗，感谢你们，爱你们`
+            },
+            {
+                name: '一颗陈皮糖',
+                icon: '🍬',
+                author: '回忆主人：不辨甄伪（亡群回忆录主编）',
+                content: `我是“亡群回忆录”的主编，【欺诈】从神——不辨甄伪。
+
+当刺目的“解散”二字出现在屏幕上时，我不经怔了几秒。
+
+我曾以为登录点的长夏永不归秋，可是我忘了，一切事物终将走向消逝，这是宇宙的规律，不可更改的真理。
+
+于是我们在夏日的蝉鸣中建立群聊，又在秋夜的微风里重新开始。相遇的时光是短暂的，但美好的记忆将会永存。无论走到天涯或是海角，登录点都与我们同在。
+
+请不要把它的存在当成负担。登录点存在的意义从来不是为了束缚，而是给了我们一个归处，一个累了随时可以回去的归处。
+
+晚安登录点，我们明天见。`
+            },
+            {
+                name: '小丑鼻子',
+                icon: '🤡',
+                author: '回忆主人：小玥',
+                content: `屏幕前的家人们大家好~我是小玥呀~当然，大家叫我“嘎哒嘎哒”也是可以的（点头）
+
+我是一个平平无奇的，保命道具也不多死亡兼欺诈牧师~（害）
+
+在这个暑假，我在登录点认识了很多很好很好的朋友，虽然说登陆点不在了，但是我们永远都会在！登陆点晚安
+
+咳咳咳。要是有机会的话在这里浅浅许愿一个保命道具嘻嘻~`
+            },
+            {
+                name: '丝线',
+                icon: '🧵',
+                author: '回忆主人：命运的预言家',
+                content: `命运的预言家在践行命运意志的途中，也曾多次亵渎命运，但宽容的命运总是宽恕信徒的无理，于是预言家开始歌颂命运的宽容。
+
+命运是预言家不曾改变的主信仰，无时无刻在践行着命运，即使遭受命运所带来的不幸，也未曾动摇过自身信仰，依旧是命运最虔诚的信徒。
+
+源初降世，寰宇崩塌。就连自诩能看透一切的命运也无法看出寰宇将走向何方，寰宇的命运从此走向未知，但命运的预言家处于先知者的位置，隐隐的猜出了寰宇的命运。
+
+旧时代的命运未曾终结，新时代的命运尚未开始，愿命运庇佑你们。`
+            },
+            {
+                name: '指针',
+                icon: '🧭',
+                author: '回忆主人：指针',
+                content: `清平乐·分袂
+
+尘缘倏散，非是情悭浅。迹异心同欢伴罕，一任云疏雁远。
+
+嶂横不隔相逢，波遥自待归鸿。莫挽长亭飞絮，流年静待春风。
+
+刚在视频号刷到诸神愚戏的群，其实是有点诧异的，毕竟身边的人没什么看，一直觉得挺小众的，于是就好奇的加了一下…说起来也好玩，当时群主刚讲完计分规则，我直接在自己的ID后面写了一个2300多，当场被捕获嘿嘿
+
+后来我开始试着下本，试着写道具，试着写本，也交到了很多好朋友，桉雨一直喜欢叫我智囊，遇到问题过就甩给我；以玫喜欢打第五人格，尤其喜欢调酒师；小玥喜欢熬夜，最喜欢干的事情就是在副本里当混子；傻子梨喜欢正太，还有一些非常有意思的感情……哎呀，有好多好多人
+
+我会怀念这段时光的
+
+也谢谢大家，祝你们开学快乐哦～（因为我知道很多人作业没有写完）
+
+@不辨甄伪 你喜欢搞被刺
+我记得被你演过
+
+@现象未漫及之处 你打造的其中一个本，我记得主角在精神病医院不是人
+当时神还夸我聪明来着
+
+@现象未漫及之处 @不辨甄伪 你们两个家伙玩狼人杀的时候都坑过我`
+            },
+            {
+                name: '墓碑',
+                icon: '🪦',
+                author: '回忆主人：死亡牧师',
+                content: `大家好呀，我是一个死亡牧师，这段时间在这个群里过得真的很开心，突然听说群快要解散，我一时说不清自己到底是什么情绪，好像算不上悲伤，整个人反倒异常平静，只是心底空落落的，巨大的落差感沉沉压在心上，眼看着一个又一个熟悉的朋友慢慢离开，我心里其实有很多念头翻来覆去，可到了嘴边，却什么挽留的话都说不出口，我没有办法留住所有人，最后也只能尊重每一个人的选择，接受这场散场
+
+从前做死亡牧师，我一直笃定地认为，所有人的终点都是死亡与被遗忘，时光向前走，所有故事最后都会消散，什么都留不下来，我总盯着结局去看待一切相遇，觉得所有热闹终究只是短暂的幻影，可经历了这一段日子我忽然想明白了，何必总纠结于终局的别离呢，管他将来什么时候会走散，什么时候会被时间抹去记忆，至少在这里，我们聊过天，遇见了一群特别棒的朋友，一起熬夜打本，一起说笑打闹，分享细碎的情绪，交换奇奇怪怪的想法，那些开心是真切发生过的，那些陪伴是实实在在存在过的，我体验过，我拥有过，我感受过发自内心的快乐，这就已经足够了
+
+天下本来就没有不散的筵席，能够有幸认识在座的每一位，对我而言，是莫大的荣幸，也是命运赏赐给我的一份天大的恩赐，纵使以后很难再有这样聚在一起的时光，这段记忆，这段回忆，我也会好好珍惜`
+            }
+        ];
+
+        const scene = document.getElementById('scene');
+        const modal = document.getElementById('modal');
+        const closeBtn = document.getElementById('closeBtn');
+        const memoryAuthor = document.getElementById('memoryAuthor');
+        const memoryText = document.getElementById('memoryText');
+        const gyroBtn = document.getElementById('gyroBtn');
+
+        // 物品初始配置：位置偏移、旋转、深度系数
+        const itemConfigs = [
+            { x: -180, y: -120, rotate: -8, depth: 1.2 },
+            { x: 80, y: -160, rotate: 5, depth: 0.8 },
+            { x: -220, y: 20, rotate: 3, depth: 1.5 },
+            { x: 160, y: -40, rotate: -6, depth: 0.9 },
+            { x: -60, y: 100, rotate: 7, depth: 1.1 },
+            { x: 200, y: 120, rotate: -3, depth: 1.3 },
+            { x: -140, y: 180, rotate: -5, depth: 0.7 },
+            { x: 40, y: -80, rotate: 4, depth: 1.0 },
+            { x: 220, y: -140, rotate: -7, depth: 1.4 },
+            { x: 100, y: 200, rotate: 6, depth: 0.6 },
+            { x: -200, y: -200, rotate: 4, depth: 1.1 }
+        ];
+
+        // 创建物品
+        const itemElements = [];
+        memories.forEach((item, index) => {
+            const config = itemConfigs[index];
+            const el = document.createElement('div');
+            el.className = 'item';
+            el.dataset.index = index;
+            el.id = `item-${index}`;
+            el.style.transform = `translate(${config.x}px, ${config.y}px) rotate(${config.rotate}deg)`;
+            el.style.zIndex = Math.floor(config.depth * 10);
+            el.innerHTML = `
+                <span class="item-icon">${item.icon}</span>
+                <div class="item-name">${item.name}</div>
+            `;
+            scene.appendChild(el);
+            itemElements.push({
+                el,
+                baseX: config.x,
+                baseY: config.y,
+                rotate: config.rotate,
+                depth: config.depth
+            });
+
+            // 绑定触摸事件
+            bindInteraction(el, index);
+        });
+
+        // 交互逻辑：点击、长按拖拽
+        let longPressTimer = null;
+        let isDragging = false;
+        let dragItem = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let startX = 0;
+        let startY = 0;
+
+        function bindInteraction(el, index) {
+            // 触摸端
+            el.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                startX = touch.clientX;
+                startY = touch.clientY;
+                
+                longPressTimer = setTimeout(() => {
+                    isDragging = true;
+                    dragItem = itemElements[index];
+                    const rect = el.getBoundingClientRect();
+                    dragOffsetX = touch.clientX - rect.left - rect.width / 2;
+                    dragOffsetY = touch.clientY - rect.top - rect.height / 2;
+                    el.classList.add('grabbed');
+                    if (navigator.vibrate) navigator.vibrate(50);
+                }, 500);
+            }, { passive: true });
+
+            el.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                // 移动超过阈值取消长按
+                if (Math.abs(touch.clientX - startX) > 10 || Math.abs(touch.clientY - startY) > 10) {
+                    if (longPressTimer) {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = null;
+                    }
+                }
+
+                if (isDragging && dragItem) {
+                    const x = touch.clientX - dragOffsetX - window.innerWidth / 2;
+                    const y = touch.clientY - dragOffsetY - window.innerHeight / 2;
+                    dragItem.baseX = x;
+                    dragItem.baseY = y;
+                    el.style.transform = `translate(${x}px, ${y}px) rotate(${dragItem.rotate}deg) scale(1.1)`;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            el.addEventListener('touchend', (e) => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                    if (!isDragging) {
+                        openModal(index);
+                    }
+                }
+                if (isDragging) {
+                    isDragging = false;
+                    el.classList.remove('grabbed');
+                    el.style.transform = `translate(${dragItem.baseX}px, ${dragItem.baseY}px) rotate(${dragItem.rotate}deg)`;
+                    dragItem = null;
+                }
+            });
+
+            // PC端兼容
+            el.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                longPressTimer = setTimeout(() => {
+                    isDragging = true;
+                    dragItem = itemElements[index];
+                    const rect = el.getBoundingClientRect();
+                    dragOffsetX = e.clientX - rect.left - rect.width / 2;
+                    dragOffsetY = e.clientY - rect.top - rect.height / 2;
+                    el.classList.add('grabbed');
+                }, 500);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+                    if (longPressTimer) {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = null;
+                    }
+                }
+
+                if (isDragging && dragItem) {
+                    const x = e.clientX - dragOffsetX - window.innerWidth / 2;
+                    const y = e.clientY - dragOffsetY - window.innerHeight / 2;
+                    dragItem.baseX = x;
+                    dragItem.baseY = y;
+                    el.style.transform = `translate(${x}px, ${y}px) rotate(${dragItem.rotate}deg) scale(1.1)`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                    if (!isDragging) {
+                        openModal(index);
+                    }
+                }
+                if (isDragging) {
+                    isDragging = false;
+                    el.classList.remove('grabbed');
+                    el.style.transform = `translate(${dragItem.baseX}px, ${dragItem.baseY}px) rotate(${dragItem.rotate}deg)`;
+                    dragItem = null;
+                }
+            });
+        }
+
+        // 陀螺仪视差
+        function handleOrientation(e) {
+            const gamma = e.gamma || 0; // 左右倾斜
+            const beta = e.beta || 0;   // 前后倾斜
+
+            // 限制倾斜范围，避免过度偏移
+            const tiltX = Math.max(-30, Math.min(30, gamma));
+            const tiltY = Math.max(-30, Math.min(30, beta - 45));
+
+            itemElements.forEach((item) => {
+                if (isDragging && dragItem === item) return;
+                const moveX = item.baseX + tiltX * item.depth * 2;
+                const moveY = item.baseY + tiltY * item.depth * 2;
+                item.el.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${item.rotate}deg)`;
+            });
+        }
+
+        // PC端鼠标视差模拟
+        function handleMouseMove(e) {
+            if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) return;
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const moveX = (e.clientX - centerX) / centerX * 20;
+            const moveY = (e.clientY - centerY) / centerY * 20;
+
+            itemElements.forEach((item) => {
+                if (isDragging && dragItem === item) return;
+                const offsetX = item.baseX + moveX * item.depth;
+                const offsetY = item.baseY + moveY * item.depth;
+                item.el.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${item.rotate}deg)`;
+            });
+        }
+
+        // 陀螺仪权限申请
+        gyroBtn.addEventListener('click', () => {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(state => {
+                        if (state === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                            gyroBtn.style.display = 'none';
+                        } else {
+                            alert('需要陀螺仪权限才能体验视差效果，也可以直接点击物品查看回忆~');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('当前设备不支持陀螺仪，可直接点击物品查看回忆');
+                    });
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+                gyroBtn.style.display = 'none';
+            }
+        });
+
+        // PC端自动启用鼠标视差
+        if (!('ontouchstart' in window)) {
+            document.addEventListener('mousemove', handleMouseMove);
+            gyroBtn.textContent = '鼠标移动模拟视差';
+            gyroBtn.disabled = true;
+            gyroBtn.style.opacity = '0.7';
+        }
+
+        // 模态框控制
+        function openModal(index) {
+            const memory = memories[index];
+            memoryAuthor.textContent = memory.author;
+            memoryText.textContent = memory.content;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
